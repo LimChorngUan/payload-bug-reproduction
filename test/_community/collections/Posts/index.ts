@@ -12,6 +12,15 @@ export const PostsCollection: CollectionConfig = {
       name: 'title',
       type: 'text',
     },
+    {
+      name: 'content',
+      type: 'text',
+      admin: {
+        components: {
+          Label: './collections/Posts/CustomLabel#CustomLabel',
+        },
+      },
+    },
   ],
   versions: {
     drafts: true,
