@@ -1,6 +1,6 @@
 // What a messy code
 
-import { difference, reverse } from "ramda";
+import { difference, reverse, pluck } from "ramda";
 
 const file = Bun.file("input.txt");
 const text = await file.text();
@@ -14,10 +14,6 @@ const input: number[][] = inputTxt
 	.map((line) => line.split(",").map(Number));
 
 type RuleMap = Record<number, number[]>;
-const last = difference(
-	rules.map((rule) => rule[1]),
-	rules.map((rule) => rule[0]),
-)[0];
 const RULE_MAP: RuleMap = rules.reduce(
 	(acc, curr) => ({
 		...acc,
@@ -25,8 +21,10 @@ const RULE_MAP: RuleMap = rules.reduce(
 	}),
 	{} as RuleMap,
 );
+
+const last = difference(pluck(1, rules), pluck(0, rules))[0];
 RULE_MAP[last] = [];
-console.log(RULE_MAP);
+
 
 const isOrderCorrect = (orders: number[]): boolean => {
 	for (let i = 0; i < orders.length - 1; i++) {
