@@ -1,11 +1,11 @@
-// @.@
+// @.@ Too lazy to cleanup the code
 
-import { uniq, adjust, update, clone } from "ramda";
+import { uniq, splitAt, all, transpose, adjust, update, clone } from "ramda";
 
 type Dir = "up" | "down" | "left" | "right";
 type Coord = [number, number, Dir];
 
-const STEP: Record<Dir, Coord> = {
+const STEP: Record<Dir, [number, number]> = {
 	up: [-1, 0],
 	down: [1, 0],
 	left: [0, -1],
@@ -66,23 +66,43 @@ const walk = (
 	return walk(map, [nextX, nextY, currD], newVisitedCoords);
 };
 
-const p1 = uniq(
-	walk(MAP, START_COORD, []).visitedCoords.map((coord) => [coord[0], coord[1]]),
-).length;
+const visitedCoords: Coord[] = walk(MAP, START_COORD, [])
+	.visitedCoords.map((coord) => coord.split(","))
+	.map((coord) => [Number(coord[0]), Number(coord[1]), coord[2]]);
 
+const p1 = uniq(visitedCoords.map((coord) => [coord[0], [coord[1]]])).length;
 console.log("p1", p1);
 
-let obstacleCount = 0;
-for (let i = 0; i < MAP.length; i++) {
-	for (let j = 0; j < MAP[0].length; j++) {
-		if (MAP[i][j] === "#" || MAP[i][j] === "^") continue;
+const findLoop = (map: string[][], startCoord: Coord): boolean => {
+	const [x, y, dir] = startCoord;
+	const [nextX, nextY] = [x + STEP[dir][0], y + STEP[dir][1]];
 
-		const newMap = adjust(i, (row) => update(j, "#", row), clone(MAP));
+	if (nextX < 0 || nextY < 0 || nextX >= map[0].length || nextY >= map.length)
+		return false;
 
-		if (walk(newMap, START_COORD, []).loop === true) {
-			obstacleCount++;
-		}
-	}
-}
+	if (map[nextX][nextY] === "#") return false;
 
-console.log("p2", obstacleCount);
+	if (dir === "up" && all((el) => el !== "#", splitAt(y, map[x])[1]))
+		return false;
+	if (dir === "down" && all((el) => el !== "#", splitAt(y, map[x])[0]))
+		return false;
+	if (
+		dir === "right" &&
+		all((el) => el !== "#", splitAt(y, transpose(map)[x])[0])
+	)
+		return false;
+	if (
+		dir === "left" &&
+		all((el) => el !== "#", splitAt(y, transpose(map)[x])[1])
+	)
+		return false;
+
+	const newMap = adjust(nextX, (row) => update(nextY, "#", row), clone(map));
+
+	return walk(newMap, startCoord, []).loop;
+};
+
+const p2 = visitedCoords
+	.map((coord) => findLoop(MAP, coord))
+	.filter(Boolean).length;
+console.log("p2", p2);
