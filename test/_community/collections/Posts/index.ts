@@ -26,17 +26,12 @@ export const PostsCollection: CollectionConfig = {
                 slug: 'inline-media',
                 fields: [
                   {
-                    name: 'relationship',
+                    name: 'media-relationship',
                     type: 'relationship',
                     relationTo: ['media'],
-                    hasMany: false,
+                    required: true,
                   },
                 ],
-                admin: {
-                  components: {
-                    Label: './collections/Posts/CustomInlineBlockLabel#CustomInlineBlockLabel',
-                  },
-                },
               },
             ],
           }),
