@@ -6,6 +6,11 @@ export const PostsCollection: CollectionConfig = {
   slug: postsSlug,
   admin: {
     useAsTitle: 'title',
+    components: {
+      edit: {
+        PublishButton: './collections/Posts/PublishButton.tsx#PublishButton',
+      },
+    },
   },
   fields: [
     {
@@ -15,5 +20,6 @@ export const PostsCollection: CollectionConfig = {
   ],
   versions: {
     drafts: true,
+    maxPerDoc: 0,
   },
 }
